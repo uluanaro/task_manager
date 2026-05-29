@@ -1,9 +1,20 @@
 from fastapi import FastAPI
+from app.api.v1.routes import tasks
+from app.db.session import engine, Base
+
+Base.metadata.create_all(bind=engine)
+
 
 app = FastAPI(
     title="Task Manager API",
     description="API для управления задачами",
     version="0.1.0"
+)
+
+app.include_router(
+    tasks.router,
+    prefix="/api/v1/tasks",
+    tags=["tasks"]
 )
 
 @app.get("/")

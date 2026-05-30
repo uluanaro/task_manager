@@ -1,6 +1,8 @@
 from fastapi import FastAPI
+from app.api.v1.routes import tasks, auth
 from app.api.v1.routes import tasks
 from app.db.session import engine, Base
+import app.models.user
 
 Base.metadata.create_all(bind=engine)
 
@@ -16,6 +18,13 @@ app.include_router(
     prefix="/api/v1/tasks",
     tags=["tasks"]
 )
+
+app.include_router(
+    auth.router,
+    prefix="/api/v1/auth",
+    tags=["auth"]
+)
+
 
 @app.get("/")
 def root():

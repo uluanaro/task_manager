@@ -5,17 +5,18 @@ from app.models.task import Task
 from sqlalchemy.orm import Session
 # from datetime import datetime
 from typing import List, Optional
+from app.core.dependencies import get_current_user
+from app.models.user import User
 
 router = APIRouter()
 
 
-fake_db: list = []
-counter: int = 0
-
-
 
 @router.post("/", response_model=TaskResponse, status_code=201)
-def create_task(task: TaskCreate, db: Session = Depends(get_db)):
+def create_task(
+        task: TaskCreate,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     new_task = Task(
         title=task.title,
         description=task.description,
@@ -28,13 +29,12 @@ def create_task(task: TaskCreate, db: Session = Depends(get_db)):
     return new_task
 
 
-@router.get("/", response_model=List[TaskResponse])
-def get_tasks(db: Session = Depends(get_db)):
-    return db.query(Task).all()
-
 
 @router.get("/{task_id}", response_model=TaskResponse)
-def get_task(task_id: int, db: Session = Depends(get_db)):
+def get_task(
+        task_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Задача не найдена")
@@ -42,7 +42,11 @@ def get_task(task_id: int, db: Session = Depends(get_db)):
 
 
 @router.patch("/{task_id}", response_model=TaskResponse)
-def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get_db)):
+def update_task(
+        task_id: int,
+        task_update: TaskUpdate,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Задача не найдена")
@@ -62,7 +66,10 @@ def update_task(task_id: int, task_update: TaskUpdate, db: Session = Depends(get
 
 
 @router.delete("/{task_id}", status_code=204)
-def delete_task(task_id: int, db: Session = Depends(get_db)):
+def delete_task(
+        task_id: int,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     task = db.query(Task).filter(Task.id == task_id).first()
     if not task:
         raise HTTPException(status_code=404, detail="Задача не найдена")
@@ -70,7 +77,10 @@ def delete_task(task_id: int, db: Session = Depends(get_db)):
     db.commit()
 
 @router.get("/", response_model=List[TaskResponse])
-def get_tasks(is_completed: Optional[bool] = None, db: Session = Depends(get_db)):
+def get_tasks(
+        is_completed: Optional[bool] = None,
+        db: Session = Depends(get_db),
+        current_user: User = Depends(get_current_user)):
     query = db.query(Task)
     if is_completed is not None:
         query = query.filter(Task.is_completed == is_completed)

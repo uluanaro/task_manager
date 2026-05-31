@@ -1,5 +1,9 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, DeclarativeBase
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 DATABASE_URL = "sqlite:///./task_manager.db"
 

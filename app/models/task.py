@@ -1,6 +1,8 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime
 from sqlalchemy.sql import func
 from app.db.session import Base
+from sqlalchemy import ForeignKey
+
 
 
 class Task(Base):
@@ -12,3 +14,4 @@ class Task(Base):
     is_completed = Column(Boolean, default=False)
     priority = Column(String, default="medium")
     created_at = Column(DateTime, server_default=func.now())
+    owner_id = Column(Integer, ForeignKey("users.id"), nullable=False)
